@@ -40,10 +40,6 @@
                 "SwitchCase": 1
             }
         ],
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
         "no-console": [
             "warn"
         ],
