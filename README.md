@@ -1,5 +1,37 @@
 # MCU Peripheral Viewer
 
+[![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/embedd-team.embedd-peripheral-viewer.svg)](https://marketplace.visualstudio.com/items?itemName=embedd-team.embedd-peripheral-viewer)
+[![Open VSX](https://img.shields.io/badge/Open%20VSX-Published-green)](https://open-vsx.org/extension/embedd-team/embedd-peripheral-viewer)
+[![VS Code](https://img.shields.io/badge/VS%20Code-Extension-blue?logo=visualstudiocode)](https://marketplace.visualstudio.com/items?itemName=embedd-team.embedd-peripheral-viewer)
+
+## 🔀 Fork Manifest
+
+This extension is a fork of the [cortex-debug](https://github.com/Marus/cortex-debug).
+
+It is developed and maintained as a component of [Embedd Project Manager](https://github.com/embeddteam/EmbeddedProjectManager.git) — a unified toolkit for embedded systems development in VS Code.
+
+### Development Philosophy
+
+While this fork evolves to meet the needs of Embedd Project Manager users, **it is not intended to diverge from upstream projects**.
+
+All improvements, fixes, and enhancements introduced here are:
+- Implemented with **upstream compatibility in mind**
+- Submitted back to the original projects via **pull requests**
+- Kept in sync through a **fast update and rebase cycle**
+
+### Fast Iteration, Real Users
+
+The primary goal of this fork is to enable:
+- **Rapid iteration**
+- **Early shipping**
+- **Validation on real users**
+
+This allows us to provide a **better and faster experience** for Embedd Project Manager users, while ensuring that the upstream ecosystem benefits from every improvement made here.
+
+---
+
+## ℹ️ About This Extension
+
 Standalone SVD Viewer extension extracted from [cortex-debug](https://github.com/Marus/cortex-debug) but now work with any debugger that supports the Microsoft Debug Protocol
 
 ## Specifying SVD Files
