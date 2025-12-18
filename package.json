@@ -19,9 +19,9 @@
     "Debuggers"
   ],
   "scripts": {
-    "prepare": "yarn build",
+    "prepare": "npm run build",
     "clean": "git clean -f -x ./node_modules ./dist",
-    "build": "webpack --mode production && yarn lint",
+    "build": "webpack --mode production && npm run lint",
     "watch": "webpack -w",
     "lint": "eslint . --ext .ts,.tsx",
     "package_old": "vsce package --yarn",
@@ -34,7 +34,7 @@
     "debug-tracker-vscode": "^0.0.15",
     "jszip": "^3.10.1",
     "node-fetch": "^2.6.7",
-    "xml2js": "^0.4.23"
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@types/node": "16.x",
@@ -43,7 +43,7 @@
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "@typescript-eslint/parser": "^5.49.0",
     "@vscode/debugprotocol": "^1.59.0",
-    "@vscode/test-web": "^0.0.24",
+    "@vscode/test-web": "^0.0.77",
     "@vscode/vsce": "^2.17.0",
     "buffer": "^6.0.3",
     "eslint": "^8.33.0",
