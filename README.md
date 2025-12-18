@@ -1,4 +1,4 @@
-# MCU Peripheral Viewer
+# Embedd Peripheral Viewer
 
 [![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/embedd-team.embedd-peripheral-viewer.svg)](https://marketplace.visualstudio.com/items?itemName=embedd-team.embedd-peripheral-viewer)
 [![Open VSX](https://img.shields.io/badge/Open%20VSX-Published-green)](https://open-vsx.org/extension/embedd-team/embedd-peripheral-viewer)
