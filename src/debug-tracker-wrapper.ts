@@ -28,8 +28,19 @@ export class DebugTrackerWrapper {
     private _onDidContinueDebug: vscode.EventEmitter<vscode.DebugSession> = new vscode.EventEmitter<vscode.DebugSession>();
     public readonly onDidContinueDebug: vscode.Event<vscode.DebugSession> = this._onDidContinueDebug.event;
 
+    private _onDidReceiveDebugSessionCustomEvent: vscode.EventEmitter<vscode.DebugSessionCustomEvent> = new vscode.EventEmitter<vscode.DebugSessionCustomEvent>();
+    public readonly onDidReceiveDebugSessionCustomEvent: vscode.Event<vscode.DebugSessionCustomEvent> = this._onDidReceiveDebugSessionCustomEvent.event;
+
     private sessionIdMap: {[id: string]: vscode.DebugSession} = {};
     public async activate(context: vscode.ExtensionContext): Promise<void> {
+        // Subscribe to custom debug session events (like MemoryEvent)
+        context.subscriptions.push(
+            vscode.debug.onDidReceiveDebugSessionCustomEvent((event) => {
+                logToOutputWindow(`Custom event received: ${event.event}, session: ${event.session?.id}`);
+                this._onDidReceiveDebugSessionCustomEvent.fire(event);
+            })
+        );
+
         // TODO: Make this dynamic so reloads are needed if setting changes
         const dbgLevel = vscode.workspace.getConfiguration(manifest.PACKAGE_NAME).get<number>(manifest.DEBUG_LEVEL, 0);
         if ((dbgLevel >= 0) && (dbgLevel <= 2)) {

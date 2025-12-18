@@ -133,11 +133,21 @@ export class PeripheralNode extends PeripheralBaseNode {
 
     public async updateData(): Promise<boolean> {
         if (!this.expanded) {
+            if (vscode.debug.activeDebugConsole) {
+                vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: ${this.name} not expanded, skipping update`);
+            }
             return false;
+        }
+
+        if (vscode.debug.activeDebugConsole) {
+            vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: ${this.name} updating data...`);
         }
 
         try {
             const errors = await this.readMemory();
+            if (vscode.debug.activeDebugConsole) {
+                vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: ${this.name} readMemory completed, errors: ${errors.length}`);
+            }
             for (const error of errors) {
                 const str = `Failed to update peripheral ${this.name}: ${error}`;
                 if (vscode.debug.activeDebugConsole) {

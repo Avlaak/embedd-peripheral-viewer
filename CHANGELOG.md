@@ -1,5 +1,8 @@
 # Changelog
 
+### Added
+- Added updating peripheral register states without pausing debugging.
+
 # Before Fork History
 
 ## [v1.6.0] - 2025-08-30

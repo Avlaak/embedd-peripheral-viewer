@@ -76,9 +76,10 @@ export class Commands {
             const p = node.getPeripheral();
             if (p) {
                 await p.updateData();
+                this.peripheralProvider.refresh();
             }
         } else {
-            this.peripheralProvider.updateData();
+            await this.peripheralProvider.updateData();
         }
     }
 

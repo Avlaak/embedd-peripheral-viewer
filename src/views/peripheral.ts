@@ -155,12 +155,23 @@ export class PeripheralTreeForSession extends PeripheralBaseNode {
         throw new Error('Method not implemented.');
     }
 
-    public updateData(): Thenable<boolean> {
+    public async updateData(): Promise<boolean> {
         if (this.loaded) {
+            if (vscode.debug.activeDebugConsole) {
+                vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: PeripheralTreeForSession.updateData() called, peripherals: ${this.peripherials.length}`);
+            }
             const promises = this.peripherials.map((p) => p.updateData());
-            Promise.all(promises).then((_) => { this.fireCb(); }, (_) => { this.fireCb(); });
+            await Promise.all(promises);
+            if (vscode.debug.activeDebugConsole) {
+                vscode.debug.activeDebugConsole.appendLine('peripheral-viewer: PeripheralTreeForSession.updateData() completed, firing refresh');
+            }
+            this.fireCb();
+        } else {
+            if (vscode.debug.activeDebugConsole) {
+                vscode.debug.activeDebugConsole.appendLine('peripheral-viewer: PeripheralTreeForSession.updateData() called but not loaded');
+            }
         }
-        return Promise.resolve(true);
+        return true;
     }
 
     public getPeripheral(): PeripheralBaseNode {
@@ -258,6 +269,13 @@ export class PeripheralTreeProvider implements vscode.TreeDataProvider<Periphera
         tracker.onWillStopSession(session => this.debugSessionTerminated(session));
         tracker.onDidStopDebug(session => this.debugStopped(session));
         tracker.onDidContinueDebug(session => this.debugContinued(session));
+
+        // Handle memory events for live update during running state
+        tracker.onDidReceiveDebugSessionCustomEvent((event) => {
+            if (event.event === 'memory') {
+                this.onMemoryChanged(event.session, event.body);
+            }
+        });
     }
 
     public async activate(): Promise<void> {
@@ -418,6 +436,23 @@ export class PeripheralTreeProvider implements vscode.TreeDataProvider<Periphera
             clearTimeout(this.stopedTimer);
             this.stopedTimer = undefined;
         }
+    }
+
+    private onMemoryChanged(session: vscode.DebugSession, body: { memoryReference: string; offset: number; count: number }): void {
+        const regs = this.sessionPeripheralsMap.get(session.id);
+        if (!regs) {
+            if (vscode.debug.activeDebugConsole) {
+                vscode.debug.activeDebugConsole.appendLine('peripheral-viewer: Memory event received but no session found: ' + session.id);
+            }
+            return;
+        }
+
+        if (vscode.debug.activeDebugConsole) {
+            vscode.debug.activeDebugConsole.appendLine('peripheral-viewer: ' + session.id + ': Memory Changed at ' + body?.memoryReference);
+        }
+
+        // Refresh the tree UI - data was already read via readMemory request
+        regs.refresh();
     }
 
     public togglePinPeripheral(node: PeripheralBaseNode): void {
