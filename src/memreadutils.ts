@@ -79,7 +79,6 @@ export class MemUtils {
                 return true;
             } catch(e) {
                 let dst = r.base - startAddr;
-                // tslint:disable-next-line: prefer-for-of
                 for (let ix = 0; ix < r.length; ix++) {
                     storeTo[dst++] = 0xff;
                 }

@@ -159,7 +159,6 @@ export class SVDParser {
                 width = msb - lsb + 1;
                 offset = lsb;
             } else {
-                // tslint:disable-next-line:max-line-length
                 throw new Error(`Unable to parse SVD file: field ${f.name[0]} must have either bitOffset and bitWidth elements, bitRange Element, or msb and lsb elements.`);
             }
 

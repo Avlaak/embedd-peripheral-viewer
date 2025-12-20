@@ -258,7 +258,6 @@ export class PeripheralTreeForSession extends PeripheralBaseNode {
 }
 
 export class PeripheralTreeProvider implements vscode.TreeDataProvider<PeripheralBaseNode> {
-    // tslint:disable-next-line:variable-name
     public _onDidChangeTreeData: vscode.EventEmitter<PeripheralBaseNode | undefined> = new vscode.EventEmitter<PeripheralBaseNode | undefined>();
     public readonly onDidChangeTreeData: vscode.Event<PeripheralBaseNode | undefined> = this._onDidChangeTreeData.event;
     protected sessionPeripheralsMap = new Map <string, PeripheralTreeForSession>();
