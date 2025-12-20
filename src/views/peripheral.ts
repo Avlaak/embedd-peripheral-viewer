@@ -161,14 +161,14 @@ export class PeripheralTreeForSession extends PeripheralBaseNode {
             PeripheralNode.silentMode = silent;
             try {
                 if (!silent && vscode.debug.activeDebugConsole) {
-                    vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: PeripheralTreeForSession.updateData() called, peripherals: ${this.peripherials.length}`);
-                }
-                const promises = this.peripherials.map((p) => p.updateData());
-                await Promise.all(promises);
+                vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: PeripheralTreeForSession.updateData() called, peripherals: ${this.peripherials.length}`);
+            }
+            const promises = this.peripherials.map((p) => p.updateData());
+            await Promise.all(promises);
                 if (!silent && vscode.debug.activeDebugConsole) {
-                    vscode.debug.activeDebugConsole.appendLine('peripheral-viewer: PeripheralTreeForSession.updateData() completed, firing refresh');
-                }
-                this.fireCb();
+                vscode.debug.activeDebugConsole.appendLine('peripheral-viewer: PeripheralTreeForSession.updateData() completed, firing refresh');
+            }
+            this.fireCb();
             } finally {
                 PeripheralNode.silentMode = false;
             }
@@ -274,6 +274,10 @@ export class PeripheralTreeProvider implements vscode.TreeDataProvider<Periphera
     private livePeripheralEnabled = false;
     private livePeripheralSamplesPerSecond = 2;
 
+    // Interaction blocking - prevents live updates from interfering with user actions
+    private interactionInProgress = false;
+    private interactionTimeout: ReturnType<typeof setTimeout> | undefined;
+
     constructor(tracker: DebugTrackerWrapper, protected context: vscode.ExtensionContext) {
         tracker.onWillStartSession(session => this.debugSessionStarted(session));
         tracker.onWillStopSession(session => this.debugSessionTerminated(session));
@@ -300,12 +304,15 @@ export class PeripheralTreeProvider implements vscode.TreeDataProvider<Periphera
                 e.element.expanded = true;
                 const isReg = e.element instanceof PeripheralRegisterNode;
                 if (!isReg) {
+                    // Pause live updates briefly during expand/collapse to prevent flickering
+                    this.pauseLiveUpdates(1000);
                     // If we are at a register level, parent already expanded, no update/refresh needed
                     const p = e.element.getPeripheral();
                     if (p) {
                         p.updateData();
                         this.refresh();
                     }
+                    this.resumeLiveUpdates();
                 }
             }),
             view.onDidCollapseElement((e) => {
@@ -318,7 +325,40 @@ export class PeripheralTreeProvider implements vscode.TreeDataProvider<Periphera
         this._onDidChangeTreeData.fire(undefined);
     }
 
+    /**
+     * Pause live updates temporarily during user interaction.
+     * Call this before showing input dialogs, context menus, etc.
+     * @param timeoutMs Auto-resume timeout in milliseconds (default: 5000ms)
+     */
+    public pauseLiveUpdates(timeoutMs = 5000): void {
+        this.interactionInProgress = true;
+        // Clear any existing timeout
+        if (this.interactionTimeout) {
+            clearTimeout(this.interactionTimeout);
+        }
+        // Auto-resume after timeout to prevent stuck state
+        this.interactionTimeout = setTimeout(() => {
+            this.resumeLiveUpdates();
+        }, timeoutMs);
+    }
+
+    /**
+     * Resume live updates after user interaction is complete.
+     */
+    public resumeLiveUpdates(): void {
+        this.interactionInProgress = false;
+        if (this.interactionTimeout) {
+            clearTimeout(this.interactionTimeout);
+            this.interactionTimeout = undefined;
+        }
+    }
+
     public async updateData(silent = false): Promise<void> {
+        // Skip update if user interaction is in progress (prevents UI flickering during edits)
+        if (this.interactionInProgress) {
+            return;
+        }
+
         const trees = this.sessionPeripheralsMap.values();
         for (const tree of trees) {
             await tree.updateData(silent);

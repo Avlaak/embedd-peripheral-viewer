@@ -39,6 +39,8 @@ export class Commands {
     }
 
     private async peripheralsUpdateNode(node: PeripheralBaseNode): Promise<void> {
+        // Pause live updates during user interaction
+        this.peripheralProvider.pauseLiveUpdates();
         try {
             const result = await node.performUpdate();
             if (result) {
@@ -46,6 +48,8 @@ export class Commands {
             }
         } catch (error) {
             vscode.window.showErrorMessage(`Unable to update value: ${(error as Error).message}`);
+        } finally {
+            this.peripheralProvider.resumeLiveUpdates();
         }
     }
 
@@ -57,18 +61,24 @@ export class Commands {
     }
 
     private async peripheralsSetFormat(node: PeripheralBaseNode): Promise<void> {
-        const result = await vscode.window.showQuickPick([
-            { label: 'Auto', description: 'Automatically choose format (Inherits from parent)', value: NumberFormat.Auto },
-            { label: 'Hex', description: 'Format value in hexadecimal', value: NumberFormat.Hexadecimal },
-            { label: 'Decimal', description: 'Format value in decimal', value: NumberFormat.Decimal },
-            { label: 'Binary', description: 'Format value in binary', value: NumberFormat.Binary }
-        ]);
-        if (result === undefined) {
-            return;
-        }
+        // Pause live updates during user interaction
+        this.peripheralProvider.pauseLiveUpdates();
+        try {
+            const result = await vscode.window.showQuickPick([
+                { label: 'Auto', description: 'Automatically choose format (Inherits from parent)', value: NumberFormat.Auto },
+                { label: 'Hex', description: 'Format value in hexadecimal', value: NumberFormat.Hexadecimal },
+                { label: 'Decimal', description: 'Format value in decimal', value: NumberFormat.Decimal },
+                { label: 'Binary', description: 'Format value in binary', value: NumberFormat.Binary }
+            ]);
+            if (result === undefined) {
+                return;
+            }
 
-        node.format = result.value;
-        this.peripheralProvider.refresh();
+            node.format = result.value;
+            this.peripheralProvider.refresh();
+        } finally {
+            this.peripheralProvider.resumeLiveUpdates();
+        }
     }
 
     private async peripheralsForceRefresh(node?: PeripheralBaseNode): Promise<void> {
