@@ -23,7 +23,6 @@
     "build": "webpack --mode production && npm run lint",
     "watch": "webpack -w",
     "lint": "eslint . --ext .ts,.tsx",
-    "package_old": "vsce package --yarn",
     "package": "node ./release.js --package",
     "publish": "node ./release.js --publish --vsx-also",
     "browser": "vscode-test-web --extensionDevelopmentPath=.",
@@ -298,6 +297,5 @@
   "extensionKind": [
     "workspace",
     "ui"
-  ],
-  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
+  ]
 }

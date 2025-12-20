@@ -18,17 +18,12 @@ This is a guide about how you can inject peripherals information to MCU Peripher
 
 ### Adding peripheral-viewer to your VSCode extension
 
-You need to install mcu-debug/peripheral-viewer to access the types information (`PeripheralOptions`, `PeripheralRegisterOptions`, `ClusterOptions`, `FieldOptions`, `AccessType`). You can use `npm` or `yarn` with the following arguments described below:
+You need to install mcu-debug/peripheral-viewer to access the types information (`PeripheralOptions`, `PeripheralRegisterOptions`, `ClusterOptions`, `FieldOptions`, `AccessType`). You can use `npm` with the following arguments described below:
 
 Using with npm:
 ```bash
 npm install github:mcu-debug/peripheral-viewer
 ```
-Using with yarn:
-```bash
-yarn add github:mcu-debug/peripheral-viewer
-```
-
 
 ### Developing your extension
 
