@@ -155,25 +155,13 @@ export class PeripheralTreeForSession extends PeripheralBaseNode {
         throw new Error('Method not implemented.');
     }
 
-    public async updateData(silent = false): Promise<boolean> {
+    public async updateData(): Promise<boolean> {
         if (this.loaded) {
-            // Set silent mode to suppress verbose logging during live updates
-            PeripheralNode.silentMode = silent;
-            try {
-                if (!silent && vscode.debug.activeDebugConsole) {
-                vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: PeripheralTreeForSession.updateData() called, peripherals: ${this.peripherials.length}`);
-            }
             const promises = this.peripherials.map((p) => p.updateData());
             await Promise.all(promises);
-                if (!silent && vscode.debug.activeDebugConsole) {
-                vscode.debug.activeDebugConsole.appendLine('peripheral-viewer: PeripheralTreeForSession.updateData() completed, firing refresh');
-            }
             this.fireCb();
-            } finally {
-                PeripheralNode.silentMode = false;
-            }
         } else {
-            if (!silent && vscode.debug.activeDebugConsole) {
+            if (vscode.debug.activeDebugConsole) {
                 vscode.debug.activeDebugConsole.appendLine('peripheral-viewer: PeripheralTreeForSession.updateData() called but not loaded');
             }
         }
@@ -353,7 +341,7 @@ export class PeripheralTreeProvider implements vscode.TreeDataProvider<Periphera
         }
     }
 
-    public async updateData(silent = false): Promise<void> {
+    public async updateData(): Promise<void> {
         // Skip update if user interaction is in progress (prevents UI flickering during edits)
         if (this.interactionInProgress) {
             return;
@@ -361,7 +349,7 @@ export class PeripheralTreeProvider implements vscode.TreeDataProvider<Periphera
 
         const trees = this.sessionPeripheralsMap.values();
         for (const tree of trees) {
-            await tree.updateData(silent);
+            await tree.updateData();
         }
 
         this.refresh();
@@ -531,7 +519,7 @@ export class PeripheralTreeProvider implements vscode.TreeDataProvider<Periphera
                 vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: Starting live update timer with interval ${interval}ms`);
             }
             this.liveUpdateTimer = setInterval(() => {
-                this.updateData(true); // silent mode for live updates
+                this.updateData();
             }, interval);
         }
     }

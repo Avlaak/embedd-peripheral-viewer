@@ -44,9 +44,6 @@ export interface PeripheralOptions {
 export class PeripheralNode extends PeripheralBaseNode {
     private children: Array<PeripheralRegisterNode | PeripheralClusterNode>;
 
-    // Static flag to suppress verbose logging during live updates
-    public static silentMode = false;
-
     public readonly name: string;
     public readonly baseAddress: number;
     public readonly description: string;
@@ -136,24 +133,12 @@ export class PeripheralNode extends PeripheralBaseNode {
 
     public async updateData(): Promise<boolean> {
         if (!this.expanded) {
-            // Only log if not in silent mode (live update mode)
-            if (!PeripheralNode.silentMode && vscode.debug.activeDebugConsole) {
-                vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: ${this.name} not expanded, skipping update`);
-            }
             return false;
-        }
-
-        if (!PeripheralNode.silentMode && vscode.debug.activeDebugConsole) {
-            vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: ${this.name} updating data...`);
         }
 
         try {
             const errors = await this.readMemory();
-            if (!PeripheralNode.silentMode && vscode.debug.activeDebugConsole) {
-                vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: ${this.name} readMemory completed, errors: ${errors.length}`);
-            }
             for (const error of errors) {
-                // Always log errors, even in silent mode
                 if (vscode.debug.activeDebugConsole) {
                     const str = `Failed to update peripheral ${this.name}: ${error}`;
                     vscode.debug.activeDebugConsole.appendLine(str);
