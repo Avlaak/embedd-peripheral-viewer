@@ -135,19 +135,19 @@
       "touchBar": [
         {
           "command": "mcu-debug.peripheral-viewer.svd.forceRefresh",
-          "when": "view == mcu-debug.peripheral-viewer.svd && viewItem == registerRW"
+          "when": "view == mcu-debug.peripheral-viewer.svd && viewItem == registerRW && (!mcu-debug.peripheral-viewer.livePeripheralEnabled || debugState == stopped)"
         },
         {
           "command": "mcu-debug.peripheral-viewer.svd.forceRefresh",
-          "when": "view == mcu-debug.peripheral-viewer.svd && viewItem == register"
+          "when": "view == mcu-debug.peripheral-viewer.svd && viewItem == register && (!mcu-debug.peripheral-viewer.livePeripheralEnabled || debugState == stopped)"
         },
         {
           "command": "mcu-debug.peripheral-viewer.svd.forceRefresh",
-          "when": "view == mcu-debug.peripheral-viewer.svd && viewItem == registerRO"
+          "when": "view == mcu-debug.peripheral-viewer.svd && viewItem == registerRO && (!mcu-debug.peripheral-viewer.livePeripheralEnabled || debugState == stopped)"
         },
         {
           "command": "mcu-debug.peripheral-viewer.svd.forceRefresh",
-          "when": "view == mcu-debug.peripheral-viewer.svd && viewItem =~ /peripheral.*/"
+          "when": "view == mcu-debug.peripheral-viewer.svd && viewItem =~ /peripheral.*/ && (!mcu-debug.peripheral-viewer.livePeripheralEnabled || debugState == stopped)"
         },
         {
           "command": "mcu-debug.peripheral-viewer.svd.pin",
@@ -161,7 +161,7 @@
       "view/title": [
         {
           "command": "mcu-debug.peripheral-viewer.svd.refreshAll",
-          "when": "view == mcu-debug.peripheral-viewer.svd && debugState == stopped",
+          "when": "view == mcu-debug.peripheral-viewer.svd && (!mcu-debug.peripheral-viewer.livePeripheralEnabled || debugState == stopped)",
           "group": "navigation"
         }
       ],
@@ -208,22 +208,22 @@
         },
         {
           "command": "mcu-debug.peripheral-viewer.svd.forceRefresh",
-          "when": "view == mcu-debug.peripheral-viewer.svd && viewItem == registerRW",
+          "when": "view == mcu-debug.peripheral-viewer.svd && viewItem == registerRW && (!mcu-debug.peripheral-viewer.livePeripheralEnabled || debugState == stopped)",
           "group": "inline"
         },
         {
           "command": "mcu-debug.peripheral-viewer.svd.forceRefresh",
-          "when": "view == mcu-debug.peripheral-viewer.svd && viewItem == register",
+          "when": "view == mcu-debug.peripheral-viewer.svd && viewItem == register && (!mcu-debug.peripheral-viewer.livePeripheralEnabled || debugState == stopped)",
           "group": "inline"
         },
         {
           "command": "mcu-debug.peripheral-viewer.svd.forceRefresh",
-          "when": "view == mcu-debug.peripheral-viewer.svd && viewItem == registerRO",
+          "when": "view == mcu-debug.peripheral-viewer.svd && viewItem == registerRO && (!mcu-debug.peripheral-viewer.livePeripheralEnabled || debugState == stopped)",
           "group": "inline"
         },
         {
           "command": "mcu-debug.peripheral-viewer.svd.forceRefresh",
-          "when": "view == mcu-debug.peripheral-viewer.svd && viewItem =~ /peripheral.*/",
+          "when": "view == mcu-debug.peripheral-viewer.svd && viewItem =~ /peripheral.*/ && (!mcu-debug.peripheral-viewer.livePeripheralEnabled || debugState == stopped)",
           "group": "inline"
         },
         {

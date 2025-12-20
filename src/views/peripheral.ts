@@ -155,19 +155,25 @@ export class PeripheralTreeForSession extends PeripheralBaseNode {
         throw new Error('Method not implemented.');
     }
 
-    public async updateData(): Promise<boolean> {
+    public async updateData(silent = false): Promise<boolean> {
         if (this.loaded) {
-            if (vscode.debug.activeDebugConsole) {
-                vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: PeripheralTreeForSession.updateData() called, peripherals: ${this.peripherials.length}`);
+            // Set silent mode to suppress verbose logging during live updates
+            PeripheralNode.silentMode = silent;
+            try {
+                if (!silent && vscode.debug.activeDebugConsole) {
+                    vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: PeripheralTreeForSession.updateData() called, peripherals: ${this.peripherials.length}`);
+                }
+                const promises = this.peripherials.map((p) => p.updateData());
+                await Promise.all(promises);
+                if (!silent && vscode.debug.activeDebugConsole) {
+                    vscode.debug.activeDebugConsole.appendLine('peripheral-viewer: PeripheralTreeForSession.updateData() completed, firing refresh');
+                }
+                this.fireCb();
+            } finally {
+                PeripheralNode.silentMode = false;
             }
-            const promises = this.peripherials.map((p) => p.updateData());
-            await Promise.all(promises);
-            if (vscode.debug.activeDebugConsole) {
-                vscode.debug.activeDebugConsole.appendLine('peripheral-viewer: PeripheralTreeForSession.updateData() completed, firing refresh');
-            }
-            this.fireCb();
         } else {
-            if (vscode.debug.activeDebugConsole) {
+            if (!silent && vscode.debug.activeDebugConsole) {
                 vscode.debug.activeDebugConsole.appendLine('peripheral-viewer: PeripheralTreeForSession.updateData() called but not loaded');
             }
         }
@@ -263,6 +269,11 @@ export class PeripheralTreeProvider implements vscode.TreeDataProvider<Periphera
     protected sessionPeripheralsMap = new Map <string, PeripheralTreeForSession>();
     protected oldState = new Map <string, vscode.TreeItemCollapsibleState>();
 
+    // Live update fields
+    private liveUpdateTimer: ReturnType<typeof setInterval> | undefined;
+    private livePeripheralEnabled = false;
+    private livePeripheralSamplesPerSecond = 2;
+
     constructor(tracker: DebugTrackerWrapper, protected context: vscode.ExtensionContext) {
         tracker.onWillStartSession(session => this.debugSessionStarted(session));
         tracker.onWillStopSession(session => this.debugSessionTerminated(session));
@@ -307,10 +318,10 @@ export class PeripheralTreeProvider implements vscode.TreeDataProvider<Periphera
         this._onDidChangeTreeData.fire(undefined);
     }
 
-    public async updateData(): Promise<void> {
+    public async updateData(silent = false): Promise<void> {
         const trees = this.sessionPeripheralsMap.values();
         for (const tree of trees) {
-            await tree.updateData();
+            await tree.updateData(silent);
         }
 
         this.refresh();
@@ -380,6 +391,25 @@ export class PeripheralTreeProvider implements vscode.TreeDataProvider<Periphera
         } finally {
             this._onDidChangeTreeData.fire(undefined);
         }
+
+        // Get livePeripheral configuration from debug session
+        try {
+            const args = await session.customRequest('get-arguments');
+            if (args?.livePeripheral?.enabled) {
+                this.livePeripheralEnabled = true;
+                this.livePeripheralSamplesPerSecond = Math.min(args.livePeripheral.samplesPerSecond || 2, 10);
+                vscode.commands.executeCommand('setContext', `${manifest.PACKAGE_NAME}.livePeripheralEnabled`, true);
+                if (vscode.debug.activeDebugConsole) {
+                    vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: livePeripheral enabled with ${this.livePeripheralSamplesPerSecond} samples/sec`);
+                }
+            } else {
+                this.livePeripheralEnabled = false;
+                vscode.commands.executeCommand('setContext', `${manifest.PACKAGE_NAME}.livePeripheralEnabled`, false);
+            }
+        } catch {
+            this.livePeripheralEnabled = false;
+            vscode.commands.executeCommand('setContext', `${manifest.PACKAGE_NAME}.livePeripheralEnabled`, false);
+        }
     }
 
     public debugSessionTerminated(session: vscode.DebugSession): void {
@@ -389,6 +419,15 @@ export class PeripheralTreeProvider implements vscode.TreeDataProvider<Periphera
         if (traceExec && vscode.debug.activeDebugConsole) {
             vscode.debug.activeDebugConsole.appendLine('peripheral-viewer: ' + session.id + ': Session Terminated');
         }
+
+        // Stop live update timer and reset flags
+        if (this.liveUpdateTimer) {
+            clearInterval(this.liveUpdateTimer);
+            this.liveUpdateTimer = undefined;
+        }
+        this.livePeripheralEnabled = false;
+        vscode.commands.executeCommand('setContext', `${manifest.PACKAGE_NAME}.livePeripheralEnabled`, false);
+
         if (this.stopedTimer) {
             clearTimeout(this.stopedTimer);
             this.stopedTimer = undefined;
@@ -403,13 +442,22 @@ export class PeripheralTreeProvider implements vscode.TreeDataProvider<Periphera
         }
     }
 
-    private stopedTimer: NodeJS.Timeout | undefined;
+    private stopedTimer: ReturnType<typeof setTimeout> | undefined;
     public debugStopped(session: vscode.DebugSession): void {
         if (!this.sessionPeripheralsMap.get(session.id)) {
             return;
         }
         if (traceExec && vscode.debug.activeDebugConsole) {
             vscode.debug.activeDebugConsole.appendLine('peripheral-viewer: ' + session.id + ': Session Stopped');
+        }
+
+        // Stop live update timer when program stops
+        if (this.liveUpdateTimer) {
+            clearInterval(this.liveUpdateTimer);
+            this.liveUpdateTimer = undefined;
+            if (vscode.debug.activeDebugConsole) {
+                vscode.debug.activeDebugConsole.appendLine('peripheral-viewer: Live update timer stopped');
+            }
         }
 
         // We are stopped for many reasons very briefly where we cannot even execute any queries
@@ -434,6 +482,17 @@ export class PeripheralTreeProvider implements vscode.TreeDataProvider<Periphera
         if (this.stopedTimer) {
             clearTimeout(this.stopedTimer);
             this.stopedTimer = undefined;
+        }
+
+        // Start live update timer if livePeripheral is enabled
+        if (this.livePeripheralEnabled && !this.liveUpdateTimer) {
+            const interval = Math.max(100, 1000 / this.livePeripheralSamplesPerSecond);
+            if (vscode.debug.activeDebugConsole) {
+                vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: Starting live update timer with interval ${interval}ms`);
+            }
+            this.liveUpdateTimer = setInterval(() => {
+                this.updateData(true); // silent mode for live updates
+            }, interval);
         }
     }
 

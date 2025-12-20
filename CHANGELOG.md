@@ -1,5 +1,8 @@
 # Changelog
 
+### Added
+- Added live peripheral register updates.
+
 ## [1.7.0] - 2025-12-19
 
 ### Added

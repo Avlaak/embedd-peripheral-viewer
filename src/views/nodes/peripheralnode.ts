@@ -44,6 +44,9 @@ export interface PeripheralOptions {
 export class PeripheralNode extends PeripheralBaseNode {
     private children: Array<PeripheralRegisterNode | PeripheralClusterNode>;
 
+    // Static flag to suppress verbose logging during live updates
+    public static silentMode = false;
+
     public readonly name: string;
     public readonly baseAddress: number;
     public readonly description: string;
@@ -69,11 +72,11 @@ export class PeripheralNode extends PeripheralBaseNode {
         this.children = [];
         this.addrRanges = [];
 
-        for(const cluster of options.clusters || []) {
+        for (const cluster of options.clusters || []) {
             this.addChild(new PeripheralClusterNode(this, cluster));
         }
 
-        for(const register of options.registers || []) {
+        for (const register of options.registers || []) {
             this.addChild(new PeripheralRegisterNode(this, register));
         }
     }
@@ -133,24 +136,26 @@ export class PeripheralNode extends PeripheralBaseNode {
 
     public async updateData(): Promise<boolean> {
         if (!this.expanded) {
-            if (vscode.debug.activeDebugConsole) {
+            // Only log if not in silent mode (live update mode)
+            if (!PeripheralNode.silentMode && vscode.debug.activeDebugConsole) {
                 vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: ${this.name} not expanded, skipping update`);
             }
             return false;
         }
 
-        if (vscode.debug.activeDebugConsole) {
+        if (!PeripheralNode.silentMode && vscode.debug.activeDebugConsole) {
             vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: ${this.name} updating data...`);
         }
 
         try {
             const errors = await this.readMemory();
-            if (vscode.debug.activeDebugConsole) {
+            if (!PeripheralNode.silentMode && vscode.debug.activeDebugConsole) {
                 vscode.debug.activeDebugConsole.appendLine(`peripheral-viewer: ${this.name} readMemory completed, errors: ${errors.length}`);
             }
             for (const error of errors) {
-                const str = `Failed to update peripheral ${this.name}: ${error}`;
+                // Always log errors, even in silent mode
                 if (vscode.debug.activeDebugConsole) {
+                    const str = `Failed to update peripheral ${this.name}: ${error}`;
                     vscode.debug.activeDebugConsole.appendLine(str);
                 }
             }
@@ -248,7 +253,7 @@ export class PeripheralNode extends PeripheralBaseNode {
         return results;
     }
 
-    public findByPath(path: string[]): PeripheralBaseNode | undefined{
+    public findByPath(path: string[]): PeripheralBaseNode | undefined {
         if (path.length === 0) {
             return this;
         } else {
