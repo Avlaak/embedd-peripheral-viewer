@@ -2,7 +2,7 @@
   "name": "embedd-peripheral-viewer",
   "displayName": "Embedd Peripheral Viewer",
   "description": "Standalone Peripheral(SVD) Viewer extension extracted from cortex-debug, now works with any debugger - Fork of mcu-debug/peripheral-viewer with additional features...",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "publisher": "embedd-team",
   "author": "haneefdm & thegecko",
   "license": "MIT",

@@ -1,7 +1,15 @@
 # Changelog
 
+## [1.7.1] - 2025-12-29
+
 ### Added
-- Added live peripheral register updates.
+- Added live peripheral register updates. For live peripheral updates to work, install embedd-cortex-debug version 1.14.4 or higher and enable the `livePeripheral` configuration option. In your launch.json, add:
+  ```json
+  "livePeripheral": {
+      "enabled": true,
+      "samplesPerSecond": 4
+  }
+  ```
 
 ## [1.7.0] - 2025-12-19
 
