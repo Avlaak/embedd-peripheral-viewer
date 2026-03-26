@@ -15,6 +15,7 @@ It is developed and maintained as a component of [Embedd Project Manager](https:
 While this fork evolves to meet the needs of Embedd Project Manager users, **it is not intended to diverge from upstream projects**.
 
 All improvements, fixes, and enhancements introduced here are:
+
 - Implemented with **upstream compatibility in mind**
 - Submitted back to the original projects via **pull requests**
 - Kept in sync through a **fast update and rebase cycle**
@@ -22,6 +23,7 @@ All improvements, fixes, and enhancements introduced here are:
 ### Fast Iteration, Real Users
 
 The primary goal of this fork is to enable:
+
 - **Rapid iteration**
 - **Early shipping**
 - **Validation on real users**
@@ -64,7 +66,7 @@ If the pack supports multiple devices and/or processors, you will be prompted to
 }
 ```
 
-__TIP:__ The pack reference and device name can be automatically derived if you use the [Arm Device Manager extension in VS Code](https://marketplace.visualstudio.com/items?itemName=Arm.device-manager) using these commands:
+**TIP:** The pack reference and device name can be automatically derived if you use the [Arm Device Manager extension in VS Code](https://marketplace.visualstudio.com/items?itemName=Arm.device-manager) using these commands:
 
 ```json
 {
