@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.7.2] - 2026-03-26
+
+### Changed
+- Update logo.
+
 ## [1.7.1] - 2025-12-29
 
 ### Added
