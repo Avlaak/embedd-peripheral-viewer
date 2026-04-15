@@ -8,6 +8,7 @@ import { Commands } from '../commands';
 import { DebugTrackerWrapper } from '../debug-tracker-wrapper';
 import { SvdRegistry } from '../svd-registry';
 import { logToOutputWindow } from '../vscode-utils';
+import { checkForUpdates, scheduleAutoUpdateCheck } from '../updater';
 export * from '../types';
 
 export const activate = async (context: vscode.ExtensionContext): Promise<SvdRegistry> => {
@@ -21,6 +22,14 @@ export const activate = async (context: vscode.ExtensionContext): Promise<SvdReg
     await tracker.activate(context);
     await peripheralTree.activate();
     await commands.activate(context);
+
+    const checkUpdatesCmd = vscode.commands.registerCommand(
+        'mcu-debug.peripheral-viewer.svd.checkUpdates',
+        () => checkForUpdates(false)
+    );
+    context.subscriptions.push(checkUpdatesCmd);
+
+    scheduleAutoUpdateCheck(context);
 
     return registry;
 };

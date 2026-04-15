@@ -1,5 +1,8 @@
 # Changelog
 
+### Added
+- Add automatically updating extension from GitHub API.
+
 ## [1.7.2] - 2026-03-26
 
 ### Changed

@@ -99,6 +99,11 @@
         "command": "mcu-debug.peripheral-viewer.svd.refreshAll",
         "title": "Refresh All",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "mcu-debug.peripheral-viewer.svd.checkUpdates",
+        "title": "Check for updates",
+        "icon": "$(cloud-download)"
       }
     ],
     "menus": {
@@ -286,6 +291,12 @@
           "type": "boolean",
           "default": true,
           "description": "Save layout of peripheral view between sessions"
+        },
+        "mcu-debug.peripheral-viewer.autoCheckUpdates": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically check for extension updates on startup",
+          "scope": "application"
         }
       }
     }
