@@ -44,7 +44,7 @@ function isPreRelease() {
 }
 
 function vsceRun(pkgOnly) {
-    const args = ['npx', 'vsce', (pkgOnly ? 'package' : 'publish'), '--yarn'];
+    const args = ['npx', 'vsce', (pkgOnly ? 'package' : 'publish')];
     if (isPreRelease()) {
         args.push('--pre-release');
         if (vsxAlso) {
@@ -90,7 +90,8 @@ function runProg(args, cb) {
     const cmd = args.join(' ');
     const arg0 = args.shift();
     const prog = child_process.spawn(arg0, args, {
-        stdio:'inherit'
+        stdio:'inherit',
+        shell: true
     });
     prog.on('error', (error) => {
         console.error(`Error running '${cmd}': ${error.message}`);
