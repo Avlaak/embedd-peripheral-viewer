@@ -67,10 +67,12 @@ function httpsDownload(url: string, destPath: string): Promise<void> {
                 resolve();
             });
             file.on('error', (err) => {
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
                 fs.unlink(destPath, () => { });
                 reject(err);
             });
         }).on('error', (err) => {
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
             fs.unlink(destPath, () => { });
             reject(err);
         });
@@ -160,10 +162,11 @@ export async function checkForUpdates(silent: boolean): Promise<void> {
         if (selection === install) {
             await downloadAndInstall(latest.downloadUrl, latest.version);
         }
-    } catch (err: any) {
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
         if (!silent) {
             vscode.window.showErrorMessage(
-                `${EXTENSION_DISPLAY_NAME}: update check failed — ${err.message}`
+                `${EXTENSION_DISPLAY_NAME}: update check failed — ${message}`
             );
         }
     }
@@ -196,6 +199,7 @@ async function downloadAndInstall(downloadUrl: string, version: string): Promise
                     vscode.commands.executeCommand('workbench.action.reloadWindow');
                 }
             } finally {
+                // eslint-disable-next-line @typescript-eslint/no-empty-function
                 fs.unlink(vsixPath, () => { });
             }
         }
