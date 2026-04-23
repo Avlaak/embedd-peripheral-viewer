@@ -1,6 +1,7 @@
 # Embedd Peripheral Viewer
 
 [![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/embedd-team.embedd-peripheral-viewer.svg)](https://marketplace.visualstudio.com/items?itemName=embedd-team.embedd-peripheral-viewer)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Open VSX](https://img.shields.io/badge/Open%20VSX-Published-green)](https://open-vsx.org/extension/embedd-team/embedd-peripheral-viewer)
 [![VS Code](https://img.shields.io/badge/VS%20Code-Extension-blue?logo=visualstudiocode)](https://marketplace.visualstudio.com/items?itemName=embedd-team.embedd-peripheral-viewer)
 
